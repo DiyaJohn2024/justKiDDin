@@ -27,11 +27,11 @@ db = firestore.client()
 
 # Initialize Groq (MUCH FASTER than Gemini!)
 groq_client = Groq(
-    api_key="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"
+    api_key=""
   # Replace with your Groq key
 )
-TICKETMASTER_API_KEY = "A8CxUFC9dlozOcoJNVRrKcvg2KhOtFrh"   # Get from developer.ticketmaster.com
-CALENDARIFIC_API_KEY = "T1xszObwSiDcEV9DLxiwCjTcG879tmjk" # Get from calendarific.com
+TICKETMASTER_API_KEY = ""   # Get from developer.ticketmaster.com
+CALENDARIFIC_API_KEY = "" # Get from calendarific.com
 
 
 @app.route('/health', methods=['GET'])
