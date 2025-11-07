@@ -1,5 +1,4 @@
 
-
 import React, { useState } from "react";
 import axios from "axios";
 
@@ -19,18 +18,17 @@ function App() {
 
   const fetchGuides = async () => {
     if (guideType === "place" && !place.trim()) {
-    alert("Please enter at least one place for Place Guide");
-    return;
-  }
-  if (!destination.trim()) {
-    alert("Destination is required");
-    return;
-  }
+      alert("Please enter at least one place for Place Guide");
+      return;
+    }
+    if (!destination.trim()) {
+      alert("Destination is required");
+      return;
+    }
     try {
       const response = await axios.get("http://127.0.0.1:5000/guides", {
         params: { destination, place },
       });
-      
       setGuides(response.data.guides);
       setBookingResult(null);
       setSelectedGuide(null);
@@ -57,7 +55,7 @@ function App() {
       setUserContact("");
       setTripDate("");
     } catch (error) {
-      alert("Error booking guide"+"\n"+error);
+      alert("Error booking guide" + "\n" + error);
     }
   };
 
@@ -67,18 +65,25 @@ function App() {
         maxWidth: 600,
         margin: "2rem auto",
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        color: "#333",
+        color: "#212121",
+        background: "rgba(255,255,255,0.97)",
+        borderRadius: 16,
+        boxShadow: "0 4px 28px 0 rgba(0,0,0,0.12)",
+        padding: "2rem",
       }}
     >
-      <h2 style={{ marginBottom: "1.5rem" }}>Find and Book a Local Guide</h2>
+      <h2 style={{ marginBottom: "1.5rem", fontWeight: 700 }}>
+        Find and Book a Local Guide
+      </h2>
 
       <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
         <input
           style={{
             flex: 1,
-            padding: "0.5rem",
-            borderRadius: 4,
-            border: "1px solid #ccc",
+            padding: "0.7rem 1rem",
+            borderRadius: 8,
+            border: "1px solid #ced4da",
+            fontWeight: 500,
           }}
           placeholder="Destination"
           value={destination}
@@ -87,9 +92,10 @@ function App() {
         <input
           style={{
             flex: 2,
-            padding: "0.5rem",
-            borderRadius: 4,
-            border: "1px solid #ccc",
+            padding: "0.7rem 1rem",
+            borderRadius: 8,
+            border: "1px solid #ced4da",
+            fontWeight: 500,
           }}
           placeholder="Places (comma separated)"
           value={place}
@@ -98,9 +104,14 @@ function App() {
       </div>
 
       <div
-        style={{ marginBottom: "1rem", display: "flex", alignItems: "center" }}
+        style={{
+          marginBottom: "1rem",
+          display: "flex",
+          alignItems: "center",
+          gap: "2rem",
+        }}
       >
-        <label style={{ marginRight: "1rem" }}>
+        <label style={{ cursor: "pointer", fontWeight: 500 }}>
           <input
             type="radio"
             value="place"
@@ -112,7 +123,7 @@ function App() {
           </span>
         </label>
 
-        <label>
+        <label style={{ cursor: "pointer", fontWeight: 500 }}>
           <input
             type="radio"
             value="route"
@@ -128,13 +139,17 @@ function App() {
       <button
         onClick={fetchGuides}
         style={{
-          padding: "0.7rem 1rem",
-          backgroundColor: "#007bff",
-          color: "white",
+          padding: "0.8rem 1.4rem",
+          background: "linear-gradient(to right,#007bff,#1565c0)",
+          color: "#fff",
           border: "none",
-          borderRadius: 4,
+          borderRadius: 6,
+          fontWeight: 600,
           cursor: "pointer",
+          fontSize: "1rem",
           marginBottom: "1.5rem",
+          boxShadow: "0 2px 8px rgba(0,123,255,0.09)",
+          transition: "background 0.2s"
         }}
       >
         Search Guides
@@ -142,7 +157,7 @@ function App() {
 
       {guides.length > 0 && (
         <div>
-          <h3>Available Guides:</h3>
+          <h3 style={{ marginBottom: 16, marginTop: 16 }}>Available Guides:</h3>
           {guides.map((guide, index) => (
             <div
               key={index}
@@ -151,18 +166,29 @@ function App() {
                 border:
                   selectedGuide === guide
                     ? "2px solid #007bff"
-                    : "1px solid #ccc",
-                padding: "0.75rem",
-                marginBottom: "0.75rem",
-                borderRadius: 4,
+                    : "1px solid #ced4da",
+                padding: "1rem",
+                marginBottom: "1rem",
+                borderRadius: 10,
                 cursor: "pointer",
-                backgroundColor:
-                  selectedGuide === guide ? "#e9f5ff" : "transparent",
+                background:
+                  selectedGuide === guide
+                    ? "#e9f5ff"
+                    : "rgba(13,110,253,0.06)",
+                color: "#222",
+                fontWeight: 500,
+                boxShadow:
+                  selectedGuide === guide
+                    ? "0 2px 14px 0 rgba(0,123,255,0.06)"
+                    : "none",
+                transition: "all 0.18s"
               }}
             >
-              <b>{guide["Guide Name"]}</b> - {guide["Places"].join(", ")}, {guide["Destination"]}, {guide.Destination}
+              <b style={{ color: "#1565c0" }}>{guide["Guide Name"]}</b> -{" "}
+              {guide["Places"].join(", ")}, {guide["Destination"]}
               <br />
-              Phone: {guide["Phone Number"]}<br />
+              Phone: {guide["Phone Number"]}
+              <br />
               Languages: {guide["Languages Spoken"] || "NA"}
             </div>
           ))}
@@ -173,42 +199,67 @@ function App() {
         <div
           style={{
             marginTop: "2rem",
-            padding: "1rem",
-            border: "1px solid #ccc",
-            borderRadius: 4,
+            padding: "1.4rem",
+            border: "1px solid #007bff",
+            borderRadius: 10,
+            background: "#f4fafd"
           }}
         >
-          <h3>Book Guide: {selectedGuide["Guide Name"]}</h3>
-          <input
-            type="text"
-            placeholder="Your Name"
-            style={{ padding: "0.4rem", marginRight: "1rem", width: "40%" }}
-            value={userName}
-            onChange={(e) => setUserName(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Your Contact Info"
-            style={{ padding: "0.4rem", marginRight: "1rem", width: "40%" }}
-            value={userContact}
-            onChange={(e) => setUserContact(e.target.value)}
-          />
-          <input
-            type="date"
-            style={{ padding: "0.4rem", width: "18%" }}
-            value={tripDate}
-            onChange={(e) => setTripDate(e.target.value)}
-          />
+          <h3 style={{ marginBottom: 14, color: "#007bff", fontWeight: 700 }}>
+            Book Guide: {selectedGuide["Guide Name"]}
+          </h3>
+          <div style={{ marginBottom: 14, display: "flex", flexWrap: "wrap", gap: "1rem" }}>
+            <input
+              type="text"
+              placeholder="Your Name"
+              style={{
+                padding: "0.6rem",
+                borderRadius: 6,
+                border: "1px solid #bbb",
+                minWidth: 180,
+                flex: "1 1 120px"
+              }}
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="Your Contact Info"
+              style={{
+                padding: "0.6rem",
+                borderRadius: 6,
+                border: "1px solid #bbb",
+                minWidth: 170,
+                flex: "1 1 120px"
+              }}
+              value={userContact}
+              onChange={(e) => setUserContact(e.target.value)}
+            />
+            <input
+              type="date"
+              style={{
+                padding: "0.6rem",
+                borderRadius: 6,
+                border: "1px solid #bbb",
+                minWidth: 120,
+                flex: "1 1 90px"
+              }}
+              value={tripDate}
+              onChange={(e) => setTripDate(e.target.value)}
+            />
+          </div>
           <button
             onClick={bookGuide}
             style={{
-              marginTop: "1rem",
-              padding: "0.6rem 1rem",
-              backgroundColor: "#28a745",
+              marginTop: "0.7rem",
+              padding: "0.8rem 2.1rem",
+              background: "linear-gradient(to right,#28a745,#218838)",
               color: "white",
               border: "none",
-              borderRadius: 4,
-              cursor: "pointer",
+              borderRadius: 5,
+              fontWeight: 600,
+              boxShadow: "0 2px 8px rgba(40,167,69,0.06)",
+              cursor: "pointer"
             }}
           >
             Confirm Booking
@@ -220,13 +271,16 @@ function App() {
         <div
           style={{
             marginTop: "2rem",
-            padding: "1rem",
+            padding: "1.4rem",
             backgroundColor: "#d4edda",
             color: "#155724",
-            borderRadius: 4,
+            borderRadius: 8,
+            fontWeight: 600
           }}
         >
-          <h3>Booking Confirmed!</h3>
+          <h3 style={{ fontWeight: 700, marginBottom: 10 }}>
+            Booking Confirmed!
+          </h3>
           <p>Booking ID: {bookingResult.booking_id}</p>
           <p>Guide Name: {bookingResult.guide_name}</p>
           <p>User Name: {bookingResult.user_name}</p>

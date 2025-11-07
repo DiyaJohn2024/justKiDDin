@@ -146,7 +146,7 @@ const Dashboard = ({ user, userProfile, onLogout }) => {
           <li className="nav-item" role="presentation">
             <button 
               className={`nav-link ${activeTab === 'add' ? 'active' : ''}`}
-              onClick={() => setActiveTab('add')}
+              onClick={() => setActiveTab('add')} 
             >
               ➕ Add Local Gem
             </button>

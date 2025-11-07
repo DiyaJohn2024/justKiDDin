@@ -13,6 +13,7 @@ function Chatbot({ userProfile }) {
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
 
+  
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });

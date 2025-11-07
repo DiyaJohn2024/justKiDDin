@@ -337,8 +337,9 @@ function CommunitySpots({ userId }) {
       {/* ADD NEW SPOT VIEW */}
       {activeView === 'addNew' && (
         <div className="card">
-          <div className="card-header bg-success text-white">
-            <h5 className="mb-0">➕ Share Your Hidden Gem</h5>
+          <div className="card-header bg-success text-white" >
+            <h5 className="mb-0"
+>➕ Share Your Hidden Gem</h5>
           </div>
           <div className="card-body">
             <form onSubmit={submitSpot}>
