@@ -1,0 +1,49 @@
+/* src/pages/HomePage.css */
+.homepage {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.hero-section {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+  padding: 2rem;
+  border-radius: 15px;
+  margin-bottom: 2rem;
+}
+
+.wheel-card {
+  border: none;
+  border-radius: 15px;
+}
+
+.wheel-card .card-header {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 15px 15px 0 0;
+}
+
+.trending-card {
+  border: none;
+  border-radius: 15px;
+}
+
+.trending-item {
+  background: rgba(255, 193, 7, 0.1);
+  border-radius: 8px;
+}
+
+.category-details {
+  border: none;
+  border-radius: 15px;
+  animation: slideInRight 0.5s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
