@@ -562,6 +562,7 @@ def generate_itinerary():
     interests = data.get('interests', [])
     traveler_type = data.get('traveler_type', 'solo')
     user_id = data.get('user_id')
+    start_date = data.get('start_date')  # ← ADD THIS (get from frontend)
     
     # Get user's past search history for incremental learning
     past_searches_context = ""
@@ -585,13 +586,11 @@ def generate_itinerary():
     # Generate itinerary prompt
     prompt = f"""Create a detailed {duration}-day travel itinerary for {destination}.
 
-
 User Profile:
 - Budget: ₹{budget}
 - Interests: {', '.join(interests)}
 - Traveler Type: {traveler_type}
 {past_searches_context}
-
 
 Include:
 1. Day-wise schedule with timings (morning, afternoon, evening)
@@ -603,9 +602,7 @@ Include:
 7. Best times to visit each place to avoid crowds
 8. Safety tips and local etiquette
 
-
 **IMPORTANT**: Clearly mention specific famous places/attractions by name.
-
 
 Format it clearly with headers for each day. Make it practical, realistic, and budget-friendly for Indian travelers.
 """
@@ -633,15 +630,12 @@ Format it clearly with headers for each day. Make it practical, realistic, and b
         # ===== STEP 2: Extract famous places from itinerary =====
         extract_places_prompt = f"""From this itinerary, extract all famous places/attractions mentioned:
 
-
 {itinerary_text}
-
 
 Return ONLY a JSON object with format:
 {{
   "places": ["Place 1", "Place 2", "Place 3"]
 }}
-
 
 Extract specific attraction names, monuments, temples, beaches, etc. mentioned in the itinerary.
 """
@@ -667,10 +661,10 @@ Extract specific attraction names, monuments, temples, beaches, etc. mentioned i
                     'budget': budget,
                     'famous_places': famous_places,
                     'user_preferences': {
-                        'past_accommodation_types': []  # Can add from user history later
+                        'past_accommodation_types': []
                     }
                 },
-                timeout=10  # 10 second timeout
+                timeout=10
             )
             
             if ml_response.status_code == 200:
@@ -684,7 +678,44 @@ Extract specific attraction names, monuments, temples, beaches, etc. mentioned i
         except Exception as e:
             print(f"⚠️ Hotel recommendation error: {e}")
         
-        # ===== STEP 4: Save search history =====
+        # ===== STEP 4: CHECK SAFETY ALERTS (NEW!) =====
+        safety_alerts = []
+        safety_score = 100
+        best_time_advice = "✅ Conditions look good for travel!"
+        
+        # Calculate end date
+        if start_date:
+            from datetime import datetime, timedelta
+            try:
+                start_dt = datetime.strptime(start_date, '%Y-%m-%d')
+                end_dt = start_dt + timedelta(days=duration)
+                end_date = end_dt.strftime('%Y-%m-%d')
+                
+                # Call safety check endpoint
+                safety_check = requests.post('http://localhost:5000/check-safety-alerts', 
+                    json={
+                        'destination': destination,
+                        'city': destination,
+                        'start_date': start_date,
+                        'end_date': end_date
+                    },
+                    timeout=15
+                )
+                
+                if safety_check.status_code == 200:
+                    safety_data = safety_check.json()
+                    safety_alerts = safety_data.get('alerts', [])
+                    safety_score = safety_data.get('safety_score', 100)
+                    best_time_advice = safety_data.get('best_time_advice', best_time_advice)
+                    print(f"✅ Safety check complete: Score {safety_score}, {len(safety_alerts)} alerts")
+                else:
+                    print(f"⚠️ Safety check returned status {safety_check.status_code}")
+            except Exception as e:
+                print(f"⚠️ Safety check error: {e}")
+        else:
+            print("⚠️ No start date provided, skipping safety check")
+        
+        # ===== STEP 5: Save search history =====
         if user_id:
             try:
                 db.collection('users').document(user_id).collection('search_history').add({
@@ -700,7 +731,7 @@ Extract specific attraction names, monuments, temples, beaches, etc. mentioned i
             except Exception as e:
                 print(f"Could not save search history: {e}")
         
-        # ===== STEP 5: Return everything =====
+        # ===== STEP 6: Return everything INCLUDING SAFETY DATA =====
         return jsonify({
             'success': True,
             'itinerary': itinerary_text,
@@ -708,7 +739,10 @@ Extract specific attraction names, monuments, temples, beaches, etc. mentioned i
             'duration': duration,
             'famous_places': famous_places,
             'hotels': hotels,
-            'hotels_count': len(hotels)
+            'hotels_count': len(hotels),
+            'safety_alerts': safety_alerts,        # ← NEW
+            'safety_score': safety_score,          # ← NEW
+            'best_time_advice': best_time_advice   # ← NEW
         })
         
     except Exception as e:
@@ -717,7 +751,6 @@ Extract specific attraction names, monuments, temples, beaches, etc. mentioned i
             'success': False,
             'error': str(e)
         }), 500
- 
 
 
 
